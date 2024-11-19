@@ -1,6 +1,5 @@
 package com.example.myamal
 import android.content.Context
-import android.os.Build.VERSION_CODES.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myamal.tp5.DatabaseHelper
 import com.example.myamal.tp5.Product
 import java.io.File
 
@@ -55,6 +55,8 @@ val TrendWhite = Color(0xFFF7F7F7)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             MainScreen()
         }
@@ -205,17 +207,28 @@ fun LoginScreen(
     }
 }
 
-// Home Screen with trendy gradient background
 @Composable
 fun HomeScreen(onLogoutClick: () -> Unit) {
-    val productList = listOf(
-        Product("Jean", "Jean en denim délavé", painterResource(id = R.drawable.product_image_1)),
-        Product("Sweat-shirt", "Sweat-shirt femme décontracté à col ras", painterResource(id = R.drawable.product_image_2)),
-        Product("Baskets décontractées", "WARRIOR Baskets décontractées à semelle épaisse", painterResource(id = R.drawable.product_image_3)),
-        Product("Robe de demoiselle", "Robe de demoiselle élégante en noir et blanc", painterResource(id = R.drawable.product_image_4)),
-        Product("Sweatshirt", "Attitoon Sweatshirt imprimé 'NEW YORK BROOKLYN ' décontracté et minimaliste", painterResource(id = R.drawable.product_image_5)),
-        Product("Robe mi-longue", "SHEIN Clasi Robe mi-longue décontractée pour femmes à col rond", painterResource(id = R.drawable.product_image_6))
+    val context = LocalContext.current
+    val dbHelper = DatabaseHelper(context)
+
+    // Add products to the database
+    val productsToAdd = listOf(
+        Product("Jean", "Jean en denim délavé", painterResource(id = R.drawable.product_image_1).toString()),
+        Product("Sweat-shirt", "Sweat-shirt femme décontracté à col ras", painterResource(id = R.drawable.product_image_2).toString()),
+        Product("Baskets décontractées", "WARRIOR Baskets décontractées à semelle épaisse", painterResource(id = R.drawable.product_image_3).toString()),
+        Product("Robe de demoiselle", "Robe de demoiselle élégante en noir et blanc", painterResource(id = R.drawable.product_image_4).toString()),
+        Product("Sweatshirt", "Attitoon Sweatshirt imprimé 'NEW YORK BROOKLYN ' décontracté et minimaliste", painterResource(id = R.drawable.product_image_5).toString()),
+        Product("Robe mi-longue", "SHEIN Clasi Robe mi-longue décontractée pour femmes à col rond", painterResource(id = R.drawable.product_image_6).toString())
     )
+
+    // Insert products into the database
+    productsToAdd.forEach { product ->
+        dbHelper.addProduct(product)
+    }
+
+    // Retrieve products from the database
+    val productList = dbHelper.getAllProducts()
 
     Column(
         modifier = Modifier
@@ -247,6 +260,7 @@ fun HomeScreen(onLogoutClick: () -> Unit) {
     }
 }
 
+
 // Product Card with trendy gradient background
 @Composable
 fun ProductCard(product: Product) {
@@ -264,7 +278,7 @@ fun ProductCard(product: Product) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = product.image,
+                painter = painterResource(id = R.drawable.placeholder_image), // Replace with actual image resource or URL
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,6 +303,7 @@ fun ProductCard(product: Product) {
         }
     }
 }
+
 
 // Reset Password Screen with trendy gradient background
 @Composable
